@@ -1,52 +1,72 @@
-// Ensure the DOM is fully loaded before running the script
-document.addEventListener('DOMContentLoaded', function () {
-    // Get references to the key DOM elements
+// document.addEventListener('DOMContentLoaded', function() {
     const addButton = document.getElementById('add-task-btn');
     const taskInput = document.getElementById('task-input');
     const taskList = document.getElementById('task-list');
 
-    // Function to add a task
-    function addTask() {
-        // Trim the user input to remove extra spaces
-        const taskText = taskInput.value.trim();
+    // Load tasks from local storage
+    loadTasks();
 
-        // If input is empty, alert the user
-        if (taskText === '') {
-            alert('Please enter a task.');
-            return;
-        }
-
-        // Create a new <li> element
-        const listItem = document.createElement('li');
-        listItem.textContent = taskText;
-
-        // Create a remove button for the task
-        const removeBtn = document.createElement('button');
-        removeBtn.textContent = 'Remove';
-        removeBtn.className = 'remove-btn';
-
-        // Attach event to remove the task when button is clicked
-        removeBtn.addEventListener('click', function () {
-            taskList.removeChild(listItem);
-        });
-
-        // Add the button to the list item
-        listItem.appendChild(removeBtn);
-
-        // Add the list item to the list
-        taskList.appendChild(listItem);
-
-        // Clear the input field after adding the task
-        taskInput.value = '';
-    }
-
-    // Add task when button is clicked
+    // Add event listener to add button
     addButton.addEventListener('click', addTask);
 
-    // Add task when Enter key is pressed inside the input field
-    taskInput.addEventListener('keypress', function (event) {
+    // Add event listener to task input for enter key press
+    taskInput.addEventListener('keypress', function(event) {
         if (event.key === 'Enter') {
             addTask();
         }
     });
-});
+
+    function addTask() {
+        const taskText = taskInput.value.trim();
+        if (taskText === '') {
+            alert('Please enter a task');
+            return;
+        }
+
+        const task = document.createElement('li');
+        task.textContent = taskText;
+
+        const removeButton = document.createElement('button');
+        removeButton.textContent = 'Remove';
+        removeButton.className = 'remove-btn';
+        removeButton.addEventListener('click', function() {
+            taskList.removeChild(task);
+            removeTaskFromLocalStorage(taskText);
+        });
+
+        task.appendChild(removeButton);
+        taskList.appendChild(task);
+
+        // Save task to local storage
+        saveTaskToLocalStorage(taskText);
+
+        // Clear task input
+        taskInput.value = '';
+    }
+
+    function saveTaskToLocalStorage(task) {
+        let tasks = getTasksFromLocalStorage();
+        tasks.push(task);
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
+    function removeTaskFromLocalStorage(task) {
+        let tasks = getTasksFromLocalStorage();
+        tasks = tasks.filter(t => t !== task);
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
+    function getTasksFromLocalStorage() {
+        return JSON.parse(localStorage.getItem('tasks')) || [];
+    }
+
+    function loadTasks() {
+        let tasks = getTasksFromLocalStorage();
+        tasks.forEach(task => {
+            const taskElement = document.createElement('li');
+            taskElement.textContent = task;
+
+            const removeButton = document.createElement('button');
+            removeButton.textContent = 'Remove';
+            removeButton.className = 'remove-btn';
+            removeButton     
