@@ -1,59 +1,73 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Load tasks from localStorage when the page loads
-    loadTasks();
+function addTask(taskText, save = true) {
+  if (!taskText) {
+    alert('Please enter a task.');
+    return;
+  }
 
-    const addButton = document.getElementById('add-task-btn');
-    const taskInput = document.getElementById('task-input');
-    const taskList = document.getElementById('task-list');
+  // Create list item and remove button
+  const li = document.createElement('li');
+  li.textContent = taskText;
 
-    addButton.addEventListener('click', () => addTask(taskInput.value.trim()));
-    taskInput.addEventListener('keypress', (event) => {
-        if (event.key === 'Enter') {
-            addTask(taskInput.value.trim());
+  // ✅ Add a class to the li element
+  li.classList.add('task-item'); // <-- This is the correct way
+
+  const removeBtn = document.createElement('button');
+  removeBtn.textContent = 'Remove';
+  removeBtn.className = 'remove-btn';
+
+  // Event handler for removing task
+  removeBtn.onclick = () => {
+    taskList.removeChild(li);
+    removeFromLocalStorage(taskText);
+  };
+
+  // Append button and item to list
+  li.appendChild(removeBtn);
+  taskList.appendChild(li);
+
+  // Clear input field
+  taskInput.value = '';
+
+  // Save to localStorage
+  if (save) {
+    const storedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+    storedTasks.push(taskText);
+    localStorage.setItem('tasks', JSON.stringify(storedTasks));
+  }
+}function addTask(taskText, save = true) {
+  if (!taskText) {
+    alert('Please enter a task.');
+    return;
+  }
+
+  // Create list item and remove button
+  const li = document.createElement('li');
+  li.textContent = taskText;
+
+  // ✅ Add a class to the li element
+  li.classList.add('task-item'); // <-- This is the correct way
+
+  const removeBtn = document.createElement('button');
+  removeBtn.textContent = 'Remove';
+  removeBtn.className = 'remove-btn';
+
+  // Event handler for removing task
+  removeBtn.onclick = () => {
+    taskList.removeChild(li);
+    removeFromLocalStorage(taskText);
+  };
+
+  // Append button and item to list
+  li.appendChild(removeBtn);
+  taskList.appendChild(li);
+
+  // Clear input field
+  taskInput.value = '';
+
+  // Save to localStorage
+  if (save) {
+    const storedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+    storedTasks.push(taskText);
+    localStorage.setItem('tasks', JSON.stringify(storedTasks));
+  }
         }
-    });
-
-    function loadTasks() {
-        const storedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-        storedTasks.forEach(taskText => addTask(taskText, false)); // 'false' indicates not to save again to Local Storage
-    }
-
-    function addTask(taskText, save = true) {
-        if (taskText === "") {
-            alert("Please enter a task.");
-            return;
-        }
-
-        // Create a new list item
-        const li = document.createElement('li');
-        li.textContent = taskText;
-
-        // Create a remove button
-        const removeButton = document.createElement('button');
-        removeButton.textContent = "Remove";
-        removeButton.className = 'remove-btn';
-        removeButton.onclick = () => {
-            taskList.removeChild(li);
-            removeTaskFromStorage(taskText);
-        };
-
-        li.appendChild(removeButton);
-        taskList.appendChild(li);
-
-        // Save task to local storage
-        if (save) {
-            const storedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-            storedTasks.push(taskText);
-            localStorage.setItem('tasks', JSON.stringify(storedTasks));
-        }
-
-        // Clear the input
-        taskInput.value = '';
-    }
-
-    function removeTaskFromStorage(taskText) {
-        const storedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-        const updatedTasks = storedTasks.filter(task => task !== taskText);
-        localStorage.setItem('tasks', JSON.stringify(updatedTasks));
-    }
-});
